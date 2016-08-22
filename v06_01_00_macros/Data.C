@@ -68,6 +68,11 @@ TH1D *hdataPionTrkPitch = new TH1D("hdataPionTrkPitch", "Matched Track Pitch", 1
 
 ///////////////////////////////// "Matched Track" dE/dX vs RR ///////////////////////////////////////////
 TH2D *hdataPiondEdXvsRR = new TH2D("hdataPiondEdXvsRR", "dE/dX vs Residual Range",200, 0, 100, 200, 0, 50);
+
+
+//////////////////////////////// "Low Momentum Track" PIDA (no cuts) ///////////////////////////////////////
+TH1D *hdataLowMomentumTrkPIDA = new TH1D("hdataLowMomentumTrkPIDA", "Low Momentum PIDA", 30, 0, 30);
+
 // ===================================================================================================================
 // ====================================       END HISTOGRAMS AREA           ==========================================
 // ===================================================================================================================
@@ -735,6 +740,17 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
    double Pionpitchhit[1000]={0.};
    int nPionSpts = 0;
    
+   // ################################################
+   // ### Creating a flag for through going tracks ###
+   // ################################################
+   bool ThroughGoingTrack[1000]={false;}
+   
+   
+   // ###########################################
+   // ### Creating a flag for stopping tracks ###
+   // ###########################################
+   bool StoppingParticle[1000] = {false;}
+   
    // ############################
    // ### Loop over all tracks ###
    // ############################
@@ -742,6 +758,54 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
       {
       // ### Skipping all the tracks which aren't well matched ###
       if(!MatchTPC_WVTrack[nTPCtrk]){continue;}
+      
+      // ###################################################
+      // ### Check to see if this track is through going ###
+      // ### by checking to see if it ends on a boundary ###
+      // ###################################################
+      if(TrackEndX < 1   || TrackEndX > 42.0 || TrackEndY > 19 ||
+         TrackEndY < -19 || TrackEndZ > 89.0)
+         {ThroughGoingTrack[nTPCtrk] = true;}
+      
+      // #####################################################
+      // ### Check to see if this track is consistent with ###
+      // ###          being from a stopping track 	   ###
+      // #####################################################
+      if(InitialKinEnAtTPC < 300)
+         {
+	 // ### Filling the  tracks PIDA value ###
+	 hdataLowMomentumTrkPIDA->Fill(trkpida[nTPCtrk][1]);
+	 
+	 // ##########################################
+	 // ###  If the PIDA is between 9 and 13   ###
+	 // ##########################################
+	 if(trkpida[nTPCtrk][1] >= 9 && trkpida[nTPCtrk][1] <= 13)
+	    {
+	    
+	    //### Setting the last energy points variable ###
+	    double lastDeltaE = 0;
+	    
+	    // ### Loop over the last five points of the track ###
+	    if(ntrkhits[nTPCtrk] >= 5)
+	       {
+	       for(size_t nlastspts = ntrkhits[nTPCtrk] - 1; nlastspts > ntrkhits[nTPCtrk] - 5; nlastspts--)
+	          {
+		  // ### Add up the energy in the last 5 points ###
+		  lastDeltaE += (trkpitchhit[nTPCtrk][1][nlastspts] * trkdedx[nTPCtrk][1][nlastspts]);
+
+	          }//<---End nlastspts loop
+
+	       }//<---End only looking if the track has 5 points
+	    
+	    // ### IF the Delta E is between 7 and 25, tag as a stopping track ###
+	    if(lastDeltaE >= 7 && lastDeltaE <= 25)
+	       {StoppingParticle[nTPCtrk] = true;}
+	    
+	    
+	    }//<---End looking at 9 < PIDA < 13
+	 }//<---End looking at low momentum tracks
+      
+      
       // ###############################################################
       // ### Looping over the calorimetry spacepoints for this track ###
       // ###############################################################
@@ -780,6 +844,7 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
       
       }//<---End nTPCtrk loop 
    
+// ---------------------------------------------------------------------------------------------------------------------------------------
    
    
    // ############################################################
@@ -794,9 +859,11 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
       // ################################
       for(size_t caloPoints = 0; caloPoints < nPionSpts; caloPoints++)
          {
-	 
+	 // ### If this calo point isn't the last point ###
 	 if(caloPoints < nPionSpts-1)
 	    {
+	    // ### If the residual range for this point is greater than the ###
+	    // ### next point....then the start point is in the right place ###
 	    if(Pionresrange[caloPoints] > Pionresrange[caloPoints+1]) 
 	       {
 	       //If the previous caloHit RR is higher than the next, that's the starting point of the track
@@ -804,14 +871,17 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
 	       Pionresrange[caloPoints]= Pionresrange[caloPoints];
 	       Pionpitchhit[caloPoints]=Pionpitchhit[caloPoints];
 	       }
+	       
+	    // ### If the residual range is backwards, we need to flip the points ###
 	    else 
 	       {
 	       Piondedx[dimCalo-1-caloPoints]= Piondedx[caloPoints];
 	       Pionresrange[dimCalo-1-caloPoints]= Pionresrange[caloPoints];
 	       Pionpitchhit[dimCalo-1-caloPoints]=Pionpitchhit[caloPoints];
 	       }
-            }
-               
+            }//<---End checking all but the last point 
+	    
+         // ### Swapping the last point if it is in the wrong place ###      
          if(caloPoints == nPionSpts-1)  
 	    {
 	    if(Pionresrange[caloPoints] > Pionresrange[caloPoints-1])
@@ -834,6 +904,7 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
    
    
    
+// ---------------------------------------------------------------------------------------------------------------------------------------
    
    
    
@@ -901,7 +972,7 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
 		  }
 	       else
 	          {
-		  // ### Go 2 points before and on point after ###
+		  // ### Go 2 points before and one point after ###
 		  Piondedx[caloPoints] = ( (Piondedx[caloPoints - 2] + Piondedx[caloPoints + 1]) / 2.);
 		  }
 	        }
@@ -922,7 +993,51 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
       
          }//<---End caloPoints loop
       
-      }//<---Only fixing calorimetry for big fluctuations   
+      }//<---Only fixing calorimetry for less big fluctuations   
+   
+   
+   
+   // =========================================================================================================================================
+   //						Filling Incident and Interacting Histograms
+   // =========================================================================================================================================
+   
+   // #########################################
+   // ### Loop over the tracks in the event ###
+   // #########################################
+   for(size_t nTPCtrk = 0; nTPCtrk < ntracks_reco; nTPCtrk++)
+      {
+      // ### Skipping all the tracks which aren't well matched ###
+      if(!MatchTPC_WVTrack[nTPCtrk]){continue;}
+      
+      // ############################################
+      // ### Loop over all the calorimetry points ###
+      // ############################################
+      for(size_t npoints = 0; npoints < nPionSpts; npoints++)
+         {
+	 // ### Filling the incidient histogram ###
+         hdataPionIncidentKE->Fill(kineticEnergy);
+      
+         // ###            Filling the interaction histogram for the last spt          ###
+	 // ### As long as it isn't a through going track and isn't tagged as stopping ###
+         if(npoints == nPionSpts -1 && !ThroughGoingTrack[nTPCtrk] && !StoppingParticle[nTPCtrk])
+            {fPionInteractions->Fill(kineticEnergy);}
+         
+	 // ################################################
+	 // ### Subtracting the energy loss in this step ###
+	 // ################################################
+         float energyLossInStep = Piondedx[npoints] * Pionpitchhit[npoints];
+         
+	 // #######################################################
+	 // ### Removing that kinetic energy from the histogram ###
+	 // #######################################################
+         kineticEnergy -= energyLossInStep;
+      
+      
+      
+      
+         }//<---End npoints loop
+      }//<---End nTPCtrk loop
+   
    
    
 
@@ -976,4 +1091,5 @@ hdataPiondEdX->Write();
 hdataPionRR->Write();
 hdataPionTrkPitch->Write();
 hdataPiondEdXvsRR->Write();
+hdataLowMomentumTrkPIDA->Write();
 }//<---End Data::Loop()
