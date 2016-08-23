@@ -57,7 +57,7 @@ TH1D *hdataWCTRKMomentum = new TH1D("hdataWCTRKMomentum", "WCtrk Momentum (MeV)"
 /////////////////////////////////// Initial Kinetic Energy (MeV) /////////////////////////////////////////////
 TH1D *hdataInitialKEMomentum = new TH1D("hdataInitialKEMomentum", "Pion Initial Momentum (MeV)", 500, 0, 2500); 
 
-/////////////////////////////////// "Matched Track" dE/dX //////////////////////////////////////////
+/////////////////////////////////// "Matched Track" dE/dX /////////////////////////////////////////////////////
 TH1D *hdataPiondEdX = new TH1D("hdataPiondEdX", "Matched Track dE/dX", 200, 0, 50);
 
 /////////////////////////////////// "Matched Track" Residual Range //////////////////////////////////////////
@@ -66,12 +66,27 @@ TH1D *hdataPionRR = new TH1D("hdataPionRR", "Matched Track Residual Range", 400,
 /////////////////////////////////// "Matched Track" Track Pitch //////////////////////////////////////////
 TH1D *hdataPionTrkPitch = new TH1D("hdataPionTrkPitch", "Matched Track Pitch", 1000, 0, 5);
 
-///////////////////////////////// "Matched Track" dE/dX vs RR ///////////////////////////////////////////
+///////////////////////////////// "Matched Track" dE/dX vs RR ///////////////////////////////////////////////
 TH2D *hdataPiondEdXvsRR = new TH2D("hdataPiondEdXvsRR", "dE/dX vs Residual Range",200, 0, 100, 200, 0, 50);
 
 
 //////////////////////////////// "Low Momentum Track" PIDA (no cuts) ///////////////////////////////////////
 TH1D *hdataLowMomentumTrkPIDA = new TH1D("hdataLowMomentumTrkPIDA", "Low Momentum PIDA", 30, 0, 30);
+
+
+// ###############################################################################
+// ### Note: The binning (number and range) needs to match between these plots ###
+// ###############################################################################
+
+/////////////////////////////////// "Pion" Incident to the slab Kinetic Energy (MeV) //////////////////////////////////////////
+TH1D *hdataIncidentKE = new TH1D("hdataIncidentKE", "Incident Kinetic Energy (MeV)", 40, 0, 2000);
+
+/////////////////////////////////// "Pion" Exiting the slab Kinetic Energy (MeV) //////////////////////////////////////////
+TH1D *hdataInteractingKE = new TH1D("hdataInteractingKE", "Interacting Kinetic Energy (MeV)", 40, 0, 2000);
+
+
+/////////////////////////////////// Cross-Section //////////////////////////////////////////////////////////////////////
+TH1F *fCrossSection = new TH1F("fCrossSection", "Cross-Section", 40, 0, 2000);
 
 // ===================================================================================================================
 // ====================================       END HISTOGRAMS AREA           ==========================================
@@ -94,6 +109,12 @@ Long64_t nbytes = 0, nb = 0;
 
 float particle_mass = 139.57; //<---Mass of Pion in MeV
 
+
+// ##########################################################
+// ### Preliminary TOF Cut (sets the bounds for TOF Reco) ###
+// ##########################################################
+double LowerTOFGoodReco = 0;
+double UpperTOFGoodReco = 30;
 
 // ###################################################
 // ### Setting the Wire Chamber momentum range and ###
@@ -200,7 +221,11 @@ bool FixCaloIssue_ExtremeFluctuation = true;
 // ########################################################
 bool FixCaloIssue_LessExtremeFluctuation = true;     
 
-    
+
+// ###################################################
+// ### Setting a flag to print out bunch of checks ###
+// ###################################################
+bool VERBOSE = false;     
 
 // ----------------------------------------------------------------
 // Create the cross section from the incident and interaction plots
@@ -240,8 +265,8 @@ int MatchWCTrackIndex[10] = {0};
 // ###############################
 // ### Looping over all events ###
 // ###############################
-//for (Long64_t jentry=0; jentry<nentries;jentry++) 
-for (Long64_t jentry=0; jentry<20000;jentry++)
+for (Long64_t jentry=0; jentry<nentries;jentry++) 
+//for (Long64_t jentry=0; jentry<20000;jentry++)
    {
    
    // #########################
@@ -284,10 +309,10 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
    for(int mmtof = 0; mmtof < ntof; mmtof++)
       {
       // ### Requiring there exists a good TOF recorded ###
-      if(tofObject[mmtof] < 0 || tofObject[mmtof] > 60)
+      if(tofObject[mmtof] < LowerTOFGoodReco || tofObject[mmtof] > UpperTOFGoodReco)
          {tofGood = false;}
       
-      if(tofObject[mmtof] > 0 && tofObject[mmtof] < 60)
+      if(tofObject[mmtof] > LowerTOFGoodReco && tofObject[mmtof] < UpperTOFGoodReco)
       hdataTOFNoCuts->Fill(tofObject[mmtof]);
       
       }//<---End mmtof
@@ -743,13 +768,13 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
    // ################################################
    // ### Creating a flag for through going tracks ###
    // ################################################
-   bool ThroughGoingTrack[1000]={false;}
+   bool ThroughGoingTrack[1000]={false};
    
    
    // ###########################################
    // ### Creating a flag for stopping tracks ###
    // ###########################################
-   bool StoppingParticle[1000] = {false;}
+   bool StoppingParticle[1000] = {false};
    
    // ############################
    // ### Loop over all tracks ###
@@ -763,8 +788,8 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
       // ### Check to see if this track is through going ###
       // ### by checking to see if it ends on a boundary ###
       // ###################################################
-      if(TrackEndX < 1   || TrackEndX > 42.0 || TrackEndY > 19 ||
-         TrackEndY < -19 || TrackEndZ > 89.0)
+      if(trkendx[nTPCtrk] < 1   || trkendx[nTPCtrk] > 42.0 || trkendy[nTPCtrk] > 19 ||
+         trkendy[nTPCtrk] < -19 || trkendz[nTPCtrk] > 89.0)
          {ThroughGoingTrack[nTPCtrk] = true;}
       
       // #####################################################
@@ -845,64 +870,90 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
       }//<---End nTPCtrk loop 
    
 // ---------------------------------------------------------------------------------------------------------------------------------------
-   
-   
+   bool HasToBeReordered = false;
+   int ReorderedCount = 0;
+   int bb = 0;
    // ############################################################
    // ### Fix the reordering problem of the calorimetry points ###
    // ############################################################
    if(FixCaloIssue_Reordering)
       {
-      size_t dimCalo = 0;
-      dimCalo = nPionSpts;
       // ################################
       // ### Loop over the caloPoints ###
       // ################################
-      for(size_t caloPoints = 0; caloPoints < nPionSpts; caloPoints++)
+      for(size_t caloPoints = 0; caloPoints < nPionSpts-1; caloPoints++)
          {
-	 // ### If this calo point isn't the last point ###
-	 if(caloPoints < nPionSpts-1)
+	 // ###           If this points Residual Range is smaller than the       ###
+	 // ### next point, then things may be out of wack and we want to reorder ###
+	 if(Pionresrange[caloPoints] < Pionresrange[caloPoints+1])
 	    {
-	    // ### If the residual range for this point is greater than the ###
-	    // ### next point....then the start point is in the right place ###
-	    if(Pionresrange[caloPoints] > Pionresrange[caloPoints+1]) 
-	       {
-	       //If the previous caloHit RR is higher than the next, that's the starting point of the track
-	       Piondedx[caloPoints]= Piondedx[caloPoints];
-	       Pionresrange[caloPoints]= Pionresrange[caloPoints];
-	       Pionpitchhit[caloPoints]=Pionpitchhit[caloPoints];
-	       }
-	       
-	    // ### If the residual range is backwards, we need to flip the points ###
-	    else 
-	       {
-	       Piondedx[dimCalo-1-caloPoints]= Piondedx[caloPoints];
-	       Pionresrange[dimCalo-1-caloPoints]= Pionresrange[caloPoints];
-	       Pionpitchhit[dimCalo-1-caloPoints]=Pionpitchhit[caloPoints];
-	       }
-            }//<---End checking all but the last point 
+	    // #######################################################
+	    // ### Set a flag that this might have to be reordered ###
+	    // #######################################################
+	    HasToBeReordered = true;
 	    
-         // ### Swapping the last point if it is in the wrong place ###      
-         if(caloPoints == nPionSpts-1)  
-	    {
-	    if(Pionresrange[caloPoints] > Pionresrange[caloPoints-1])
-	       {
-	       Piondedx[dimCalo-1-caloPoints]= Piondedx[caloPoints];
-	       Pionresrange[dimCalo-1-caloPoints]= Pionresrange[caloPoints];
-	       Pionpitchhit[dimCalo-1-caloPoints]=Pionpitchhit[caloPoints];
-	       }
-	    else
-	       {
-	       Piondedx[caloPoints]=Piondedx[caloPoints];
-	       Pionresrange[caloPoints]= Pionresrange[caloPoints];
-	       Pionpitchhit[caloPoints]=Pionpitchhit[caloPoints];
-	       }
+	    // ### counting the points that are out of order ###
+	    ReorderedCount++;
 	    }
 
-	 }//<---End caloPoints loop
-      
+         }//<---End caloPoints
       }//<---End fixing the ordering problem
    
-   
+   // #####################################################
+   // ### The things need to be reorderd for this track ###
+   // #####################################################
+   if(HasToBeReordered && ( (nPionSpts - ReorderedCount) == 1))
+      {
+      
+      // ### Temp Variables for fixing ###
+      double tempRR[1000] = {0.};
+      double tempdEdX[1000] = {0.};
+      double tempPitch[1000] = {0.};
+      
+      // ### Start at the last point ###
+      for(int aa = nPionSpts; aa > -1; aa--)
+         {
+	 // ##########################################
+	 // ### Skip the point if it is at the end ###
+	 // ##########################################
+	 if(Pionresrange[aa] == 0){continue;}
+	 
+	 // ### Reorder the points ###
+	 tempRR[bb] = Pionresrange[aa];
+	 tempdEdX[bb]     = Piondedx[aa];
+	 tempPitch[bb] = Pionpitchhit[aa];
+	 
+	 bb++;
+	 }//<---end aa 
+      
+      // ###########################
+      // ### Now swap the points ###
+      // ###########################
+      for(size_t reorder = 0; reorder < nPionSpts; reorder++)
+         {
+	 Pionresrange[reorder] = tempRR[reorder];
+	 Piondedx[reorder]     = tempdEdX[reorder];
+	 Pionpitchhit[reorder] = tempPitch[reorder];
+	 
+	 
+	 }//<---End reorder loop
+      
+      
+      }//<---End Has to be reordered
+
+   // ##################################
+   // ### Printing things as a check ###
+   // ##################################
+   if(HasToBeReordered && VERBOSE)
+      {
+      for(size_t caloPoints = 0; caloPoints < nPionSpts; caloPoints++)
+         {
+	 std::cout<<"Run = "<<run<<", Event = "<<event<<" point = "<<caloPoints<<", RR = "<<Pionresrange[caloPoints]<<", dE/dX = "<<Piondedx[caloPoints]<<std::endl;
+      
+      
+         }//<---End caloPoints
+      std::cout<<std::endl;	 
+      }//<---Putting in a print to make sure things are reordered correctly   
    
 // ---------------------------------------------------------------------------------------------------------------------------------------
    
@@ -937,6 +988,7 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
 	 // ############################################################
 	 else if(Piondedx[caloPoints] > 40. && caloPoints < (nPionSpts-1) && caloPoints > 0.)
 	    {
+	    std::cout<<"Large Fluctuation"<<std::endl;
 	    // #################################################################
 	    // ### Then just average between the previous and the next point ###
 	    // #################################################################
@@ -961,6 +1013,7 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
 	 // ### If dE/dX > 15 and more than 10cm from the end of the track and isn't the first or last point ###
 	 if(Piondedx[caloPoints] > 15. && Pionresrange[caloPoints] > 10. && caloPoints > 0.&& caloPoints < (nPionSpts-1) )
 	    {
+	    std::cout<<"Small Fluctuation"<<std::endl;
 	    // ### Check to see if the previous point is greater than 15 ###
 	    if(Piondedx[caloPoints-1] > 15.)
 	       {
@@ -1015,12 +1068,12 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
       for(size_t npoints = 0; npoints < nPionSpts; npoints++)
          {
 	 // ### Filling the incidient histogram ###
-         hdataPionIncidentKE->Fill(kineticEnergy);
+         hdataIncidentKE->Fill(kineticEnergy);
       
          // ###            Filling the interaction histogram for the last spt          ###
 	 // ### As long as it isn't a through going track and isn't tagged as stopping ###
          if(npoints == nPionSpts -1 && !ThroughGoingTrack[nTPCtrk] && !StoppingParticle[nTPCtrk])
-            {fPionInteractions->Fill(kineticEnergy);}
+            {hdataInteractingKE->Fill(kineticEnergy);}
          
 	 // ################################################
 	 // ### Subtracting the energy loss in this step ###
@@ -1044,6 +1097,56 @@ for (Long64_t jentry=0; jentry<20000;jentry++)
    }//<---End jentry loop
 
 
+// ===============================================================================================================
+//					MAKING THE CROSS-SECTION PLOT
+// ===============================================================================================================
+
+// ###################################################################
+// #### Looping over the exiting bins to extract the cross-section ###
+// ###################################################################
+for( int iBin = 1; iBin <= hdataInteractingKE->GetNbinsX(); ++iBin )
+   {
+   // ### If an incident bin is equal to zero then skip that bin ###
+   if( hdataIncidentKE->GetBinContent(iBin) == 0 )continue; //Temporary fix to ensure that no Infinities are propagated to pad
+   
+   // ### Cross-section = (Exit Bins / Incident Bins) * (1/Density) * (1/slab width) ###
+   float TempCrossSection = (hdataInteractingKE->GetBinContent(iBin)/hdataIncidentKE->GetBinContent(iBin)) * (1/number_density) * (1/slab_width);
+   
+   // ### Covert this into Barns ###
+   float crossSection = TempCrossSection * (1/1e-28);
+   
+   // ### Putting the value on the plot
+   fCrossSection->SetBinContent(iBin,crossSection);
+   
+   // ###########################################################
+   // ### Calculating the error on the numerator of the ratio ###
+   // ###########################################################
+   float numError = pow(hdataInteractingKE->GetBinContent(iBin),0.5);
+   float num = hdataInteractingKE->GetBinContent(iBin);
+
+   // ### Putting in a protection against dividing by zero ###   
+   if(num == 0){num = 1;}
+   float term1 = numError/num;
+   
+   // #################################################
+   // ### Calculating the error on the denomentator ###
+   // #################################################
+   float denomError = pow(hdataIncidentKE->GetBinContent(iBin),0.5);
+   float denom = hdataIncidentKE->GetBinContent(iBin);
+   if(denom == 0){denom = 1;}
+   
+   // ### Putting in a protection against dividing by zero ###
+   float term2 = denomError/denom;
+   
+   float totalError = (TempCrossSection) * (pow( ( (term1*term1) + (term2*term2) ),0.5)) * (1/number_density) * (1/slab_width) * (1/1e-28) *(1e26);
+   //std::cout<<"totalError = "<<totalError<<std::endl;
+   fCrossSection->SetBinError(iBin,totalError);
+   
+   }//<---End iBin Loop
+
+
+
+
 // ========================================================================================================
 // ===					EVENT REDUCTION TABLE						===
 // ========================================================================================================
@@ -1052,7 +1155,7 @@ std::cout<<"####################################################################
 std::cout<<"### Number of Events in AnaModule                                = "<<nTotalEvents<<" ###"<<std::endl;
 std::cout<<"-------------------------------   Stage 0   ----------------------------"<<std::endl;
 std::cout<<"### Number of Events w/ WC Track                                 = "<<nEvtsWCTrack<<" ###"<<std::endl;
-std::cout<<"### Number of Events w/ TOF > 0 ns and < 60 ns                   = "<<nEvtsTOF<<" ###"<<std::endl;
+std::cout<<"### Number of Events w/ TOF > "<<LowerTOFGoodReco<<" ns and < "<<UpperTOFGoodReco<<" ns                   = "<<nEvtsTOF<<" ###"<<std::endl;
 std::cout<<"### Number of Events w/ Good TPC info (nHits > 0)		     = "<<nEvntsTPC<<" ###"<<std::endl;
 std::cout<<"-------------------------------   Stage 1   ----------------------------"<<std::endl;
 std::cout<<"### Number of Events w/ PID consistent with Pi/Mu                = "<<nEvtsPID<<" ###"<<std::endl;
@@ -1092,4 +1195,7 @@ hdataPionRR->Write();
 hdataPionTrkPitch->Write();
 hdataPiondEdXvsRR->Write();
 hdataLowMomentumTrkPIDA->Write();
+hdataIncidentKE->Write();
+hdataInteractingKE->Write();
+fCrossSection->Write();
 }//<---End Data::Loop()
