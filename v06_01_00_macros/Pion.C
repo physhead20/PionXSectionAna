@@ -1,25 +1,64 @@
-#define Data_cxx
-#include "Data.h"
+#define Pion_cxx
+#include "Pion.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
-
-// #######################################################################################
-// ### This is the macro for data analysis of the pion sample based on the latest cuts ###
-// ###      using Run I Negative Polarity in LArIATsoft version 06_01_00               ###
-// #######################################################################################
 
 // ===================================================================================================================
 // ====================================       PUT HISTOGRAMS HERE           ==========================================
 // ===================================================================================================================
 
-/////////////////////////////////// Events with and without WC Tracks //////////////////////////////////////////
-///////////////////////////////  0 = No WCTrack Exists, 1 = WCTrack Exists   ///////////////////////////////////
-TH1D *hdataWCTrackExist = new TH1D("hdataWCTrackExist", "Existance of WCTrack", 2, 0, 2);
+// *********************************** GEANT INFORMATION ****************************************************************
 
 
-/////////////////////////////////// Full TOF for the data sample, no cuts //////////////////////////////////////
-TH1D *hdataTOFNoCuts = new TH1D("hdataTOFNoCuts", "Time of Flight (No Cuts)", 120, 0, 120);
+/////////////////////////////////// Primary Particle Start X Position //////////////////////////////////////////
+TH1D *hMCPrimaryStartX = new TH1D("hMCPrimaryStartX", "Primary Particle X_{0}", 200, -50 , 50);
+/////////////////////////////////// Primary Particle Start Y Position //////////////////////////////////////////
+TH1D *hMCPrimaryStartY = new TH1D("hMCPrimaryStartY", "Primary Particle Y_{0}", 200, -50 , 50);
+/////////////////////////////////// Primary Particle Start Z Position //////////////////////////////////////////
+TH1D *hMCPrimaryStartZ = new TH1D("hMCPrimaryStartZ", "Primary Particle Z_{0}", 600, -120 , 180);
+
+/////////////////////////////////// Primary Projected Particle Start X Position //////////////////////////////////////////
+TH1D *hMCPrimaryProjectedStartX = new TH1D("hMCPrimaryProjectedStartX", "Primary Particle X_{0}", 200, -50 , 50);
+/////////////////////////////////// Primary Projected Particle Start Y Position //////////////////////////////////////////
+TH1D *hMCPrimaryProjectedStartY = new TH1D("hMCPrimaryProjectedStartY", "Primary Particle Y_{0}", 200, -50 , 50);
+/////////////////////////////////// Primary Projected Particle Start Z Position //////////////////////////////////////////
+TH1D *hMCPrimaryProjectedStartZ = new TH1D("hMCPrimaryProjectedStartZ", "Primary Particle Z_{0}", 400, -50 , 150);
+
+/////////////////////////////////// Primary Particle End X Position //////////////////////////////////////////
+TH1D *hMCPrimaryEndX = new TH1D("hMCPrimaryEndX", "Primary Particle X_{f}", 400, -200 , 200);
+/////////////////////////////////// Primary Particle End Y Position //////////////////////////////////////////
+TH1D *hMCPrimaryEndY = new TH1D("hMCPrimaryEndY", "Primary Particle Y_{f}", 400, -200 , 200);
+/////////////////////////////////// Primary Particle End Z Position //////////////////////////////////////////
+TH1D *hMCPrimaryEndZ = new TH1D("hMCPrimaryEndZ", "Primary Particle Z_{f}", 600, -120 , 480);
+
+/////////////////////////////////// Primary Particle Px  //////////////////////////////////////////
+TH1D *hMCPrimaryPx = new TH1D("hMCPrimaryPx", "Primary Particle P_{x}", 300, -150 , 150);
+/////////////////////////////////// Primary Particle Py  //////////////////////////////////////////
+TH1D *hMCPrimaryPy = new TH1D("hMCPrimaryPy", "Primary Particle P_{y}", 300, -159 , 150);
+/////////////////////////////////// Primary Particle Pz //////////////////////////////////////////
+TH1D *hMCPrimaryPz = new TH1D("hMCPrimaryPz", "Primary Particle P_{z}", 3000, -500 , 2500);
+
+/////////////////////////////////// Primary Particle Process //////////////////////////////////////////
+TH1D *hMCPrimaryProcess = new TH1D("hMCPrimaryProcess", "Primary Particle Process", 100, 0 , 10);
+
+/////////////////////////////////// Primary End X vs Z Position //////////////////////////////////////////////
+TH2D *hMCPrimaryEndXvsZ = new TH2D("hMCPrimaryEndXvsZ", "X_{f} vs Z_{f}", 600, -150, 450, 400, -200, 200);
+/////////////////////////////////// Primary End Y vs Z Position //////////////////////////////////////////////
+TH2D *hMCPrimaryEndYvsZ = new TH2D("hMCPrimaryEndYvsZ", "Y_{f} vs Z_{f}", 600, -150, 450, 200, -200, 200);
+
+/////////////////////////////////// Energy Loss in the upstream region of the beamline ///////////////////////
+TH1D *hMCELossUpstream = new TH1D("hMCELossUpstream", "Energy loss prior to entering the TPC", 1000, 0, 1000);
+
+/////////////////////////////////// True Length //////////////////////////////////////////
+TH1D *hTrueLength = new TH1D("hTrueLength", "#True Length of the Primary Particle inside the TPC", 200, 0 , 100);
+
+
+// **********************************************************************************************************************
+
+
+
+// ********************************************** RECONSTRUCTED INFORMATION **********************************************
 
 /////////////////////////////////// Wire Chamber Track Momentum vs TOF, no cuts ////////////////////////////////
 TH2D *hdataWCTrackMomentumVSTOF = new TH2D("hdataWCTrackMomentumVSTOF", "TOF vs WCTrack Momentum", 250, 0, 2500, 200, 0, 100);
@@ -76,7 +115,6 @@ TH2D *hdataPiondEdXvsRR = new TH2D("hdataPiondEdXvsRR", "dE/dX vs Residual Range
 //////////////////////////////// "Low Momentum Track" PIDA (no cuts) ///////////////////////////////////////
 TH1D *hdataLowMomentumTrkPIDA = new TH1D("hdataLowMomentumTrkPIDA", "Low Momentum PIDA", 30, 0, 30);
 
-
 /////////////////////////////////// Reconstructed Length //////////////////////////////////////////
 TH1D *hRecoLength = new TH1D("hRecoLength", "#Reconstructed Length of the Primary Particle inside the TPC", 200, 0 , 100);
 
@@ -87,17 +125,21 @@ TH1D *hRecoLength = new TH1D("hRecoLength", "#Reconstructed Length of the Primar
 /////////////////////////////////// "Pion" Incident to the slab Kinetic Energy (MeV) //////////////////////////////////////////
 TH1D *hdataIncidentKE = new TH1D("hdataIncidentKE", "Incident Kinetic Energy (MeV)", 40, 0, 2000);
 
-/////////////////////////////////// "Pion" Exiting the slab Kinetic Energy (MeV) //////////////////////////////////////////
+/////////////////////////////////// "Pion" Incident to the slab Kinetic Energy (MeV) //////////////////////////////////////////
+TH1D *hdataIncidentKEunweighted = new TH1D("hdataIncidentKEunweighted", "Incident Kinetic Energy (MeV) (unweighted)", 40, 0, 2000);
+
+/////////////////////////////////// "Pion" Exiting the slab Kinetic Energy (MeV) /////////////////////////////////////////////
 TH1D *hdataInteractingKE = new TH1D("hdataInteractingKE", "Interacting Kinetic Energy (MeV)", 40, 0, 2000);
 
+/////////////////////////////////// "Pion" Exiting the slab Kinetic Energy (MeV) (Unweighted) ////////////////////////////////
+TH1D *hdataInteractingKEunweighted = new TH1D("hdataInteractingKEunweighted", "Interacting Kinetic Energy (MeV) (unweighted)", 40, 0, 2000);
 
-/////////////////////////////////// Cross-Section //////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////// Cross-Section ////////////////////////////////////////////////////////////////////////////
 TH1F *fCrossSection = new TH1F("fCrossSection", "Cross-Section", 40, 0, 2000);
 
-// ===================================================================================================================
-// ====================================       END HISTOGRAMS AREA           ==========================================
-// ===================================================================================================================
-void Data::Loop()
+
+void Pion::Loop()
 {
 if (fChain == 0) return;
 Long64_t nentries = fChain->GetEntriesFast();
@@ -199,6 +241,7 @@ float EventWeight = 1.0;
 // #################################################
 bool UseEventWeight = true;
 
+
 // ##########################################################
 // ### Choose whether to remove identified stopping pions ###
 // ###                                                    ###
@@ -269,12 +312,9 @@ float slab_width = 0.0045;//in m
 // ##########################################################
 int nTotalEvents = 0, nEvtsWCTrack = 0, nEvtsWCTrackMatch = 0, nEvtsTrackZPos = 0, nEvntsTPC = 0;
 int nEvtsTOF = 0, nEvtsPID = 0, nLowZTrkEvents = 0;
-int nNonShowerEvents = 0;
+int nNonShowerEvents = 0, nEvtsGoodMC = 0;
 
-// #######################################################
-// ### Providing an index for the Matched WC/TPC track ###
-// #######################################################
-int MatchWCTrackIndex[10] = {0};
+
 
 // ###############################
 // ### Looping over all events ###
@@ -298,81 +338,237 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
    // === Outputting every nEvents to the screen ===
    if(nTotalEvents % 500 == 0){std::cout<<"Event = "<<nTotalEvents<<std::endl;}
    
+   //=======================================================================================================================
+   //					      GEANT 4 Information
+   //=======================================================================================================================
+   // ##################################################
+   // ### Defining some useful variables we will use ###
+   // ##################################################
+   int nG4Primary = 0;
+   int nG4TrajPoints = 0;
    
-   //=======================================================================================================================
-   //						Wire Chamber Track Cuts
-   //=======================================================================================================================
-   // ########################################
-   // ### Skipping events with no WC Track ###
-   // ########################################
-   if(nwctrks < 1){hdataWCTrackExist->Fill(0); continue;}
-   // ### Counting Events w/ WC Track ###
-   hdataWCTrackExist->Fill(1);
-   nEvtsWCTrack++;
+   float g4Primary_X0[100] = {0.}, g4Primary_Y0[100] = {0.}, g4Primary_Z0[100] = {0.};
+   float g4Primary_ProjX0[100] = {0.}, g4Primary_ProjY0[100] = {0.}, g4Primary_ProjZ0[100] = {0.};
    
-   //=======================================================================================================================
-   //						 TOF Event Selection (ns)
-   //=======================================================================================================================
+   float g4Primary_Xf[100] = {0.}, g4Primary_Yf[100] = {0.}, g4Primary_Zf[100] = {0.};
+   float g4Primary_Px[100] = {0.}, g4Primary_Py[100] = {0.}, g4Primary_Pz[100] = {0.};
    
-   bool tofGood = true;
-   // ################################################
-   // ### If no TOF obeject exists, skip the event ###
-   // ################################################
-   if(ntof < 1){continue;}
-   // ### Loop over all the TOF objects ###
-   for(int mmtof = 0; mmtof < ntof; mmtof++)
+   int g4Primary_TrkID[100] = {999}, g4PrimaryProcess[100] = {0};
+   
+   int nG4PriTrj = 0;
+   float g4Primary_TrueTrjX[10][10000] = {0.}, g4Primary_TrueTrjY[10][10000] = {0.}, g4Primary_TrueTrjZ[10][10000] = {0.};
+   float g4Primary_TrueTrjPx[10][10000] = {0.}, g4Primary_TrueTrjPy[10][10000] = {0.}, g4Primary_TrueTrjPz[10][10000] = {0.};
+   
+   
+   float TrueLength = 0;
+   float RecoLength = 0;
+   // ##########################################
+   // ### Loop over all the GEANT4 particles ###
+   // ##########################################
+   for (int iG4 = 0; iG4 < geant_list_size; iG4++)
       {
-      // ### Requiring there exists a good TOF recorded ###
-      if(tofObject[mmtof] < LowerTOFGoodReco || tofObject[mmtof] > UpperTOFGoodReco)
-         {tofGood = false;}
-      
-      hdataTOFNoCuts->Fill(tofObject[mmtof]);
-      
-      
-      
-      
-      }//<---End mmtof
+      // #####################################################
+      // ### If this is a primary particle then look at it ###
+      // #####################################################
+      if(process_primary[iG4] == 1)
+         {
+
+	 
+	 // ### Recording information for use later ###
+	 g4Primary_X0[nG4Primary] = StartPointx[iG4];
+	 g4Primary_Y0[nG4Primary] = StartPointy[iG4];
+	 g4Primary_Z0[nG4Primary] = StartPointz[iG4];
+	 
+	 g4Primary_Xf[nG4Primary] = EndPointx[iG4];
+	 g4Primary_Yf[nG4Primary] = EndPointy[iG4];
+	 g4Primary_Zf[nG4Primary] = EndPointz[iG4];
+	 
+	 g4Primary_Px[nG4Primary] = Px[iG4] * 1000; //<---Converting to MeV
+	 g4Primary_Py[nG4Primary] = Py[iG4] * 1000; //<---Converting to MeV
+	 g4Primary_Pz[nG4Primary] = Pz[iG4] * 1000; //<---Converting to MeV
+	 
+	 // ### Setting a global event weight ###
+	 // 100 MeV < P < 200 MeV = 0.02
+   	 // 200 MeV < P < 300 MeV = 0.10
+   	 // 300 MeV < P < 400 MeV = 0.535
+   	 // 400 MeV < P < 500 MeV = 0.84
+   	 // 500 MeV < P < 600 MeV = 0.965
+   	 // 600 MeV < P < 700 MeV = 1.0
+   	 // 700 MeV < P < 800 MeV = 0.62
+   	 // 800 MeV < P < 900 MeV = 0.225
+   	 // 900 MeV < P < 1000MeV = 0.094
+   	 // 1000MeV < P < 1100MeV = 0.0275
+   	 // 1100MeV < P < 1500MeV = 0.01
+	 
+	 // ### Setting Event weight ### 
+	 if(UseEventWeight)
+	    {
+	    if(g4Primary_Pz[nG4Primary] > 0   && g4Primary_Pz[nG4Primary] < 100){EventWeight = 0.010;}
+	    if(g4Primary_Pz[nG4Primary] > 100 && g4Primary_Pz[nG4Primary] < 200){EventWeight = 0.020;}
+	    if(g4Primary_Pz[nG4Primary] > 200 && g4Primary_Pz[nG4Primary] < 300){EventWeight = 0.100;}
+	    if(g4Primary_Pz[nG4Primary] > 300 && g4Primary_Pz[nG4Primary] < 400){EventWeight = 0.535;}
+	    if(g4Primary_Pz[nG4Primary] > 400 && g4Primary_Pz[nG4Primary] < 500){EventWeight = 0.840;}
+	    if(g4Primary_Pz[nG4Primary] > 500 && g4Primary_Pz[nG4Primary] < 600){EventWeight = 0.965;}
+	    if(g4Primary_Pz[nG4Primary] > 600 && g4Primary_Pz[nG4Primary] < 700){EventWeight = 1.000;}
+	    if(g4Primary_Pz[nG4Primary] > 700 && g4Primary_Pz[nG4Primary] < 800){EventWeight = 0.620;}
+	    if(g4Primary_Pz[nG4Primary] > 800 && g4Primary_Pz[nG4Primary] < 900){EventWeight = 0.225;}
+	    if(g4Primary_Pz[nG4Primary] > 900 && g4Primary_Pz[nG4Primary] <1000){EventWeight = 0.094;}
+	    if(g4Primary_Pz[nG4Primary] >1000 && g4Primary_Pz[nG4Primary] <1100){EventWeight = 0.0275;}
+	    if(g4Primary_Pz[nG4Primary] >1100){EventWeight = 0.010;}
+	    
+	    }//<---End Assigning Event weight
+	 
+	 TrueLength = sqrt( ((EndPointz[iG4]-StartPointz[iG4])*(EndPointz[iG4]-StartPointz[iG4])) + 
+	                    ((EndPointy[iG4]-StartPointy[iG4])*(EndPointy[iG4]-StartPointy[iG4])) + 
+	                    ((EndPointx[iG4]-StartPointx[iG4])*(EndPointx[iG4]-StartPointx[iG4])) );
+			    
+	 hTrueLength->Fill(TrueLength);
+	 
+	 // ------------------------------------------------------------------------------------
+	 // ---------------        Extrapolate the X, Y, Z position of the primary         -----
+	 // ---------------     if it started upstream of the front face of the TPC        -----
+	 // ------------------------------------------------------------------------------------
+	 
+	 double b1 = StartPointz[iG4] - StartPointx[iG4]*Pz[iG4]/Px[iG4];
+	 double b2 = StartPointz[iG4] - StartPointy[iG4]*Pz[iG4]/Py[iG4];
+	 
+	 g4Primary_ProjX0[nG4Primary] = -b1*Px[iG4]/Pz[iG4];
+	 g4Primary_ProjY0[nG4Primary] = -b2*Py[iG4]/Pz[iG4];
+	 g4Primary_ProjZ0[nG4Primary] = 0.0;
+	 
+	 // ### Setting the primary particles Track ID ###
+	 g4Primary_TrkID[nG4Primary] = TrackId[iG4];
+	 
+	 
+	 hMCPrimaryEndXvsZ->Fill(EndPointz[iG4], EndPointx[iG4]);
+	 hMCPrimaryEndYvsZ->Fill(EndPointz[iG4], EndPointy[iG4]);
+	 
+	 // ##############################
+	 // ### Filling the histograms ###
+	 // ##############################
+	 hMCPrimaryPx->Fill(g4Primary_Px[nG4Primary], EventWeight);
+	 hMCPrimaryPy->Fill(g4Primary_Py[nG4Primary], EventWeight);
+	 hMCPrimaryPz->Fill(g4Primary_Pz[nG4Primary], EventWeight);
+
+	 hMCPrimaryStartX->Fill(StartPointx[iG4]);
+	 hMCPrimaryStartY->Fill(StartPointy[iG4]);
+	 hMCPrimaryStartZ->Fill(StartPointz[iG4]);
+	 
+	 hMCPrimaryEndX->Fill(EndPointx[iG4]);
+	 hMCPrimaryEndY->Fill(EndPointy[iG4]);
+	 hMCPrimaryEndZ->Fill(EndPointz[iG4]);
+
+	 hMCPrimaryProjectedStartX->Fill(g4Primary_ProjX0[nG4Primary]);
+	 hMCPrimaryProjectedStartY->Fill(g4Primary_ProjY0[nG4Primary]);
+	 hMCPrimaryProjectedStartZ->Fill(g4Primary_ProjZ0[nG4Primary]);
+	 
+	 nG4TrajPoints = 0;
+	 
+	 // ### Recording the primary particles trajectory points ###
+	 for(int iG4Tr = 0; iG4Tr < NTrTrajPts[iG4]; iG4Tr++)
+	    {
+	    g4Primary_TrueTrjX[nG4Primary][nG4PriTrj] = MidPosX[iG4][iG4Tr];
+	    g4Primary_TrueTrjY[nG4Primary][nG4PriTrj] = MidPosY[iG4][iG4Tr];
+	    g4Primary_TrueTrjZ[nG4Primary][nG4PriTrj] = MidPosZ[iG4][iG4Tr];
+	    
+	    //std::cout<<"g4Primary_TrueTrjZ[nG4Primary][nG4PriTrj] = "<<g4Primary_TrueTrjZ[nG4Primary][nG4PriTrj]<<std::endl;
+	    
+	    g4Primary_TrueTrjPx[nG4Primary][nG4PriTrj] = MidPx[iG4][iG4Tr]*1000;//<---Converting to MeV
+	    g4Primary_TrueTrjPy[nG4Primary][nG4PriTrj] = MidPy[iG4][iG4Tr]*1000;//<---Converting to MeV
+	    g4Primary_TrueTrjPz[nG4Primary][nG4PriTrj] = MidPz[iG4][iG4Tr]*1000;//<---Converting to MeV
+	    
+	    nG4PriTrj++;
+	    }//<---end looping over this primary particles true trajectory points
+	 
+	 
+	 // ### Bumping the counters ###
+	 nG4Primary++;
+	 
+	 }//<---End Looking only at primaries
+
+      }// <---End iG4 Loop
    
-   if(!tofGood){continue;}
-   nEvtsTOF++;
-   
-   
-   //=======================================================================================================================
-   //						 Putting in a GOOD TPC Cut (looking for nhits > 0
-   //=======================================================================================================================
-   
-   // ### Skip the event if no hits are reconstructed in the TPC ###
-   if(nhits < 1){continue;}
-   nEvntsTPC++;
-   
-   
-   // ======================================================================================================================
-   //						  Particle ID Filter
-   // ======================================================================================================================
-   
-   bool GoodPID = false;
-       
-   // ### Loop over the WCTracks and TOF Objects ###
-   for (int numWCTrk = 0; numWCTrk < nwctrks; numWCTrk++)
+   // ################################################
+   // ### Loop over all the GEANT4 particles again ###
+   // ###  to get the process from the daughters   ###
+   // ################################################
+   for (int iG4 = 0; iG4 < geant_list_size; iG4++)
       {
       
-      // ### Checking the number of TOF objects ###
-      int TOFObject = numWCTrk;
-      hdataWCTrackMomentumVSTOF->Fill(wctrk_momentum[numWCTrk] , tofObject[TOFObject]);
-      // ### If we have more WCObjects the TOF, put in protection ### 
-      if(TOFObject > ntof){TOFObject = ntof -1;}
+      // ### Looking for the Daughters of the primary ###
+      if(Mother[iG4] == g4Primary_TrkID[nG4Primary - 1])
+	 {
+	 g4PrimaryProcess[nG4Primary - 1] = Process[iG4];
+	 
+	 
+	 
+	 
+	 }//<---End matching daughters
       
-      // ### Only keeping events that fall into the WCTrk Momentum and TOF range ###
-      if(wctrk_momentum[numWCTrk] > LowerWCTrkMomentum && wctrk_momentum[numWCTrk] < HighWCTrkMomentum && 
-         tofObject[TOFObject] > LowerTOF && tofObject[TOFObject] < HighTOF)
-         {GoodPID = true;}
-      
-      
-      }//<---end numWCTrk
-   if(!GoodPID){continue;}
+      }//<---end iG4 loop
+   hMCPrimaryProcess->Fill(g4PrimaryProcess[nG4Primary - 1]);
+
+   //=======================================================================================================================
+   //				Only looking at events where the primary particle enters the TPC
+   //=======================================================================================================================
    
-   nEvtsPID++;
+   bool GoodMCEventInTPC = true;
    
+   // ##############################################
+   // ### Looping over all the primary particles ###
+   // ##############################################
+   for(int npri = 0; npri < nG4Primary; npri++)
+      {
+      if(g4Primary_Zf[npri] < 0){GoodMCEventInTPC = false;}
+      
+      // ####################################################################
+      // ### Calculating the energy loss for particles that enter the TPC ###
+      // ####################################################################
+      if(GoodMCEventInTPC)
+         {
+	 float DifferenceInEnergy = 0;
+	 // ### Loop over the true trajectory points ###
+	 for(int ntrj = 0; ntrj < nG4PriTrj; ntrj++)
+	    {
+\
+	    // ### Only looking at point which are upstream of the TPC ###
+	    if(g4Primary_TrueTrjZ[npri][ntrj] < 0)
+	       {
+	       
+	       float Momentum_Point1 = sqrt((g4Primary_TrueTrjPx[npri][ntrj]*g4Primary_TrueTrjPx[npri][ntrj]) + 
+	                               (g4Primary_TrueTrjPy[npri][ntrj]*g4Primary_TrueTrjPy[npri][ntrj]) +
+				       (g4Primary_TrueTrjPz[npri][ntrj]*g4Primary_TrueTrjPz[npri][ntrj]));
+				       
+	       float Momentum_Point2 = sqrt((g4Primary_TrueTrjPx[npri][ntrj+1]*g4Primary_TrueTrjPx[npri][ntrj+1]) + 
+	                               (g4Primary_TrueTrjPy[npri][ntrj+1]*g4Primary_TrueTrjPy[npri][ntrj+1]) +
+				       (g4Primary_TrueTrjPz[npri][ntrj+1]*g4Primary_TrueTrjPz[npri][ntrj+1]));
+				       
+	       float Energy_Point1 = sqrt( (Momentum_Point1*Momentum_Point1) + (particle_mass*particle_mass)  );
+	       
+	       float Energy_Point2 = sqrt( (Momentum_Point2*Momentum_Point2) + (particle_mass*particle_mass)  );
+	       
+	       DifferenceInEnergy +=  Energy_Point1 - Energy_Point2;
+	       
+	       //std::cout<<"z = "<<g4Primary_TrueTrjZ[npri][ntrj]<<", DifferenceInEnergy = "<<DifferenceInEnergy<<std::endl;
+	       
+	       
+	       }//<---End only look at points which are upstream of the TPC
+	    
+	    
+	    }//<---End ntrj for loop
+	 
+	 
+	 hMCELossUpstream->Fill(DifferenceInEnergy);
+	 }//<---Only looking at events that actually make it into the TPC
+      
+      
+      }//<---End npri loop
+   
+   if(!GoodMCEventInTPC){continue;}
+   nEvtsGoodMC++;
+
+
+
    //=======================================================================================================================
    //						Low Z Spacepoint Track Cut
    //=======================================================================================================================
@@ -495,10 +691,9 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
     
     // ### Counting the event if it passes ###
     nLowZTrkEvents++;
-   
-   
+
    //=======================================================================================================================
-   //						Uniquely matching one WC Track to TPC Track
+   //						Uniquely matching one WC Track (For MC) to TPC Track
    //=======================================================================================================================
    
    // ### Keeping track of the number of matched tracks ###
@@ -512,180 +707,203 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
    // ### uniquely matched to a wire chamber track ###
    bool MatchTPC_WVTrack[500] = {false};
    
-   MatchWCTrackIndex[0] = 0;
-   MatchWCTrackIndex[1] = 0;
-   MatchWCTrackIndex[2] = 0;
-   MatchWCTrackIndex[3] = 0;
-   MatchWCTrackIndex[4] = 0;
-   MatchWCTrackIndex[5] = 0;
-   MatchWCTrackIndex[6] = 0;
-   MatchWCTrackIndex[7] = 0;
-   MatchWCTrackIndex[8] = 0;
    
-   // #############################################
-   // ### Loop over all the wire chamber tracks ###
-   // #############################################
-   for(size_t mwctrk = 0; mwctrk < nwctrks; mwctrk++)
+   // ################################################
+   // ### Calculating the angles for the Geant4 MC ###
+   // ################################################
+   TVector3 z_hat_MC(0,0,1);
+   TVector3 p_hat_0_MC;
+   
+   // ### Setting the vector for the MC using the ###
+   // ###  extrapolated Momentum vector   ###
+   p_hat_0_MC.SetX(g4Primary_Px[0]);
+   p_hat_0_MC.SetY(g4Primary_Py[0]);
+   p_hat_0_MC.SetZ(g4Primary_Pz[0]); 
+   
+   // ### Getting everything in the same convention ###
+   float mcPhi = 0;
+   float mcTheta = 0;
+   
+   // === Calculating Theta for MC ===
+   mcTheta = acos(z_hat_MC.Dot(p_hat_0_MC)/p_hat_0_MC.Mag());
+   
+   // === Calculating Phi for MC ===
+   //---------------------------------------------------------------------------------------------------------------------
+   if( p_hat_0_MC.Y() > 0 && p_hat_0_MC.X() > 0 ){ mcPhi = atan(p_hat_0_MC.Y()/p_hat_0_MC.X()); }
+   else if( p_hat_0_MC.Y() > 0 && p_hat_0_MC.X() < 0 ){ mcPhi = atan(p_hat_0_MC.Y()/p_hat_0_MC.X())+3.141592654; }
+   else if( p_hat_0_MC.Y() < 0 && p_hat_0_MC.X() < 0 ){ mcPhi = atan(p_hat_0_MC.Y()/p_hat_0_MC.X())+3.141592654; }
+   else if( p_hat_0_MC.Y() < 0 && p_hat_0_MC.X() > 0 ){ mcPhi = atan(p_hat_0_MC.Y()/p_hat_0_MC.X())+6.28318; }
+   else if( p_hat_0_MC.Y() == 0 && p_hat_0_MC.X() == 0 ){ mcPhi = 0; }//defined by convention
+   else if( p_hat_0_MC.Y() == 0 )
       {
+      if( p_hat_0_MC.X() > 0 ){ mcPhi = 0; }
+
+      else{ mcPhi = 3.141592654; }
+
+      }
+   else if( p_hat_0_MC.X() == 0 )
+      {
+      if( p_hat_0_MC.Y() > 0 ){ mcPhi = 3.141592654/2; }
+      else{ mcPhi = 3.141592654*3/2; }
+
+      }
+   //---------------------------------------------------------------------------------------------------------------------
+   
+   // ### Grab the WCTrack Theta ###;
+   hdataWCTheta->Fill(mcTheta* (180.0/3.141592654));
       
-      // ### Grab the WCTrack Theta ###;
-      hdataWCTheta->Fill(wctrk_theta[mwctrk]* (180.0/3.141592654));
+   // ### Grabbing the WCTrack Phi ###
+   hdataWCPhi->Fill(mcPhi* (180.0/3.141592654));
       
-      // ### Grabbing the WCTrack Phi ###
-      hdataWCPhi->Fill(wctrk_phi[mwctrk]* (180.0/3.141592654));
-      
-      // ####################################
-      // ### Loop over all the TPC Tracks ###
-      // ####################################
-      for(size_t nTPCtrk = 0; nTPCtrk < ntracks_reco; nTPCtrk++)
+   // ####################################
+   // ### Loop over all the TPC Tracks ###
+   // ####################################
+   for(size_t nTPCtrk = 0; nTPCtrk < ntracks_reco; nTPCtrk++)
+      {
+      // ############################################
+      // ###   Only looking at tracks which have  ###
+      // ### a point in the first N cm of the TPC ###
+      // ############################################
+      if(!PreLimTrackIndex[nTPCtrk]){continue;}
+	 
+      // === Set a dummy variables for the most upstream point ===
+      float FirstSpacePointZ = 999;
+      float FirstSpacePointY = 999;
+      float FirstSpacePointX = 999;
+	 
+      float TempTrj_X = 999;
+      float TempTrj_Y = 999;
+      float TempTrj_Z = 999;
+      // ###############################################################
+      // ### Looping over the trajectory points for the prelim-track ###
+      // ###############################################################
+      for(size_t ntrjpts = 0; ntrjpts < nTrajPoint[nTPCtrk]; ntrjpts++)
          {
-	 // ############################################
-         // ###   Only looking at tracks which have  ###
-         // ### a point in the first N cm of the TPC ###
-         // ############################################
-         if(!PreLimTrackIndex[nTPCtrk]){continue;}
-	 
-	 // === Set a dummy variables for the most upstream point ===
-	 float FirstSpacePointZ = 999;
-	 float FirstSpacePointY = 999;
-         float FirstSpacePointX = 999;
-	 
-	 float TempTrj_X = 999;
-         float TempTrj_Y = 999;
-         float TempTrj_Z = 999;
-	 // ###############################################################
-         // ### Looping over the trajectory points for the prelim-track ###
-         // ###############################################################
-         for(size_t ntrjpts = 0; ntrjpts < nTrajPoint[nTPCtrk]; ntrjpts++)
-            {
 	    
-	    // ### Recording this tracks upstream most X, Y, Z location, ###
-	    // ###       which is inside the fiducial boundary           ###
-	    if(trjPt_Z[nTPCtrk][ntrjpts] < FirstSpacePointZ && trjPt_Y[nTPCtrk][ntrjpts] > YLowerFid && 
-	       trjPt_Y[nTPCtrk][ntrjpts] < YUpperFid && trjPt_X[nTPCtrk][ntrjpts] > XLowerFid && 
-	       trjPt_X[nTPCtrk][ntrjpts] < XUpperFid && trjPt_Z[nTPCtrk][ntrjpts] < UpperPartOfTPC)
-	       {
+	 // ### Recording this tracks upstream most X, Y, Z location, ###
+	 // ###       which is inside the fiducial boundary           ###
+	 if(trjPt_Z[nTPCtrk][ntrjpts] < FirstSpacePointZ && trjPt_Y[nTPCtrk][ntrjpts] > YLowerFid && 
+	    trjPt_Y[nTPCtrk][ntrjpts] < YUpperFid && trjPt_X[nTPCtrk][ntrjpts] > XLowerFid && 
+	    trjPt_X[nTPCtrk][ntrjpts] < XUpperFid && trjPt_Z[nTPCtrk][ntrjpts] < UpperPartOfTPC)
+	    {
 	       
-	       // ######################################
-	       // ### Record the most upstream point ###
-	       // ######################################
-	       FirstSpacePointZ = trjPt_Z[nTPCtrk][ntrjpts];
-	       FirstSpacePointY = trjPt_Y[nTPCtrk][ntrjpts];
-	       FirstSpacePointX = trjPt_X[nTPCtrk][ntrjpts];
+	    // ######################################
+	    // ### Record the most upstream point ###
+	    // ######################################
+	    FirstSpacePointZ = trjPt_Z[nTPCtrk][ntrjpts];
+	    FirstSpacePointY = trjPt_Y[nTPCtrk][ntrjpts];
+	    FirstSpacePointX = trjPt_X[nTPCtrk][ntrjpts];
 	       
-	       TempTrj_X = pHat0_X[nTPCtrk][ntrjpts];
-	       TempTrj_Y = pHat0_Y[nTPCtrk][ntrjpts];
-	       TempTrj_Z = pHat0_Z[nTPCtrk][ntrjpts];
+	    TempTrj_X = pHat0_X[nTPCtrk][ntrjpts];
+	    TempTrj_Y = pHat0_Y[nTPCtrk][ntrjpts];
+	    TempTrj_Z = pHat0_Z[nTPCtrk][ntrjpts];
 	       
 	       
-	       }//<---End finding the most upstream point
-	    }//<---End ntrjpts loop
+	    }//<---End finding the most upstream point
+         }//<---End ntrjpts loop
 	 
-	 // ###################################################
-         // ### Vectors for angles between TPC and WC Track ###
-         // ###################################################
-         TVector3 z_hat(0,0,1);
-         TVector3 p_hat_0;
+      // ###################################################
+      // ### Vectors for angles between TPC and WC Track ###
+      // ###################################################
+      TVector3 z_hat(0,0,1);
+      TVector3 p_hat_0;
       
-         // ### Setting the vector for the matched track ###
-         // ###      most upstream trajectory point      ###
-         p_hat_0.SetX(TempTrj_X);
-         p_hat_0.SetY(TempTrj_Y);
-         p_hat_0.SetZ(TempTrj_Z); //<--Note: since at this point we only have one unique match
-      			          //         only having one entry should be fine
+      // ### Setting the vector for the matched track ###
+      // ###      most upstream trajectory point      ###
+      p_hat_0.SetX(TempTrj_X);
+      p_hat_0.SetY(TempTrj_Y);
+      p_hat_0.SetZ(TempTrj_Z); //<--Note: since at this point we only have one unique match
+       		               //         only having one entry should be fine
 	 			  
-	 // ===============================================================================================================
-         // 				Calculating Theta and Phi for this TPC Track
-         // ===============================================================================================================
-         // ### Calculating the Theta for the TPC Track ###
-         float tpcTheta = acos(z_hat.Dot(p_hat_0)/p_hat_0.Mag());  
-         hdataTPCTheta->Fill(tpcTheta* (180.0/3.141592654));
+      // ===============================================================================================================
+      // 				Calculating Theta and Phi for this TPC Track
+      // ===============================================================================================================
+      // ### Calculating the Theta for the TPC Track ###
+      float tpcTheta = acos(z_hat.Dot(p_hat_0)/p_hat_0.Mag());  
+      hdataTPCTheta->Fill(tpcTheta* (180.0/3.141592654));
    
-         // ### Using same convention as WCTrack to calculate phi ###
-         float phi = 0;
-         //Calculating phi (degeneracy elimination for the atan function)
-         //----------------------------------------------------------------------------------------------
-         if( p_hat_0.Y() > 0 && p_hat_0.X() > 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X()); }
-         else if( p_hat_0.Y() > 0 && p_hat_0.X() < 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X())+3.141592654; }
-         else if( p_hat_0.Y() < 0 && p_hat_0.X() < 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X())+3.141592654; }
-         else if( p_hat_0.Y() < 0 && p_hat_0.X() > 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X())+6.28318; }
-         else if( p_hat_0.Y() == 0 && p_hat_0.X() == 0 ){ phi = 0; }//defined by convention
-         else if( p_hat_0.Y() == 0 )
-            {
-            if( p_hat_0.X() > 0 ){ phi = 0; }
+      // ### Using same convention as WCTrack to calculate phi ###
+      float phi = 0;
+      //Calculating phi (degeneracy elimination for the atan function)
+      //----------------------------------------------------------------------------------------------
+      if( p_hat_0.Y() > 0 && p_hat_0.X() > 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X()); }
+      else if( p_hat_0.Y() > 0 && p_hat_0.X() < 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X())+3.141592654; }
+      else if( p_hat_0.Y() < 0 && p_hat_0.X() < 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X())+3.141592654; }
+      else if( p_hat_0.Y() < 0 && p_hat_0.X() > 0 ){ phi = atan(p_hat_0.Y()/p_hat_0.X())+6.28318; }
+      else if( p_hat_0.Y() == 0 && p_hat_0.X() == 0 ){ phi = 0; }//defined by convention
+      else if( p_hat_0.Y() == 0 )
+         {
+         if( p_hat_0.X() > 0 ){ phi = 0; }
 
-            else{ phi = 3.141592654; }
+         else{ phi = 3.141592654; }
 
-            }
-         else if( p_hat_0.X() == 0 )
-            {
-            if( p_hat_0.Y() > 0 ){ phi = 3.141592654/2; }
-            else{ phi = 3.141592654*3/2; }
+         }
+      else if( p_hat_0.X() == 0 )
+         {
+         if( p_hat_0.Y() > 0 ){ phi = 3.141592654/2; }
+         else{ phi = 3.141592654*3/2; }
 
-            }
-         //----------------------------------------------------------------------------------------------
+         }
+      //----------------------------------------------------------------------------------------------
    
-         // ### Using TPC Phi ###
-         float tpcPhi = phi; 
-         hdataTPCPhi->Fill(tpcPhi* (180.0/3.141592654));
+      // ### Using TPC Phi ###
+      float tpcPhi = phi; 
+      hdataTPCPhi->Fill(tpcPhi* (180.0/3.141592654));
       
-         // ===============================================================================================================            
-         // ===============================================================================================================
+      // ===============================================================================================================            
+      // ===============================================================================================================
 	 
-	 // #######################################################
-	 // ### Defining unit vectors for the WC and TPC tracks ###
-	 // #######################################################
-	 TVector3 theUnitVector_WCTrack;
-         TVector3 theUnitVector_TPCTrack;
+      // #######################################################
+      // ### Defining unit vectors for the WC and TPC tracks ###
+      // #######################################################
+      TVector3 theUnitVector_WCTrack;
+      TVector3 theUnitVector_TPCTrack;
 	 
-	 // === WCTrack Unit Vector ===
-         theUnitVector_WCTrack.SetX(sin(wctrk_theta[mwctrk])*cos(wctrk_phi[mwctrk]));
-         theUnitVector_WCTrack.SetY(sin(wctrk_theta[mwctrk])*sin(wctrk_phi[mwctrk]));
-         theUnitVector_WCTrack.SetZ(cos(wctrk_theta[mwctrk]));
+      // === WCTrack Unit Vector ===
+      theUnitVector_WCTrack.SetX(sin(mcTheta)*cos(mcPhi));
+      theUnitVector_WCTrack.SetY(sin(mcTheta)*sin(mcPhi));
+      theUnitVector_WCTrack.SetZ(cos(mcTheta));
     
-         // === TPC Track Unit Vector ===
-         theUnitVector_TPCTrack.SetX(sin(tpcTheta)*cos(tpcPhi));
-         theUnitVector_TPCTrack.SetY(sin(tpcTheta)*sin(tpcPhi));
-         theUnitVector_TPCTrack.SetZ(cos(tpcTheta));
+      // === TPC Track Unit Vector ===
+      theUnitVector_TPCTrack.SetX(sin(tpcTheta)*cos(tpcPhi));
+      theUnitVector_TPCTrack.SetY(sin(tpcTheta)*sin(tpcPhi));
+      theUnitVector_TPCTrack.SetZ(cos(tpcTheta));
 	 
-	 // ##########################################################################
-	 // ### Calculating the Delta X and Delta Y between WC track and TPC track ###
-	 // ##########################################################################
-	 DeltaX_WC_TPC_Track = FirstSpacePointX - (wctrk_XFaceCoor[mwctrk]* 0.1);//<---Note: *0.1 to convert to cm
-	 DeltaY_WC_TPC_Track = FirstSpacePointY - (wctrk_YFaceCoor[mwctrk]* 0.1);
+      // ##########################################################################
+      // ### Calculating the Delta X and Delta Y between WC track and TPC track ###
+      // ##########################################################################
+      DeltaX_WC_TPC_Track = FirstSpacePointX - (g4Primary_ProjX0[0]);
+      DeltaY_WC_TPC_Track = FirstSpacePointY - (g4Primary_ProjY0[0]);
 	 
-	 // ###########################################################
-         // ### Calculating the angle between WCTrack and TPC Track ###
-         // ###########################################################
-         float alpha = ( acos(theUnitVector_WCTrack.Dot(theUnitVector_TPCTrack)) )* (180.0/3.141592654);
+      // ###########################################################
+      // ### Calculating the angle between WCTrack and TPC Track ###
+      // ###########################################################
+      float alpha = ( acos(theUnitVector_WCTrack.Dot(theUnitVector_TPCTrack)) )* (180.0/3.141592654);
    
          
-	 // ### Filling the Delta X and Delta Y  and alpha between WC tracks and TPC Tracks ###
-	 hdataDeltaWCTrkY->Fill(DeltaY_WC_TPC_Track);
-	 hdataDeltaWCTrkX->Fill(DeltaX_WC_TPC_Track);
-	 hdataAlpha->Fill(alpha);
+      // ### Filling the Delta X and Delta Y  and alpha between WC tracks and TPC Tracks ###
+      hdataDeltaWCTrkY->Fill(DeltaY_WC_TPC_Track);
+      hdataDeltaWCTrkX->Fill(DeltaX_WC_TPC_Track);
+      hdataAlpha->Fill(alpha);
 	 
 	 // ###########################################################################
 	 // ### If this TPC track matches this Wire Chamber Track, bump the counter ###
 	 // ###########################################################################
-	 if( DeltaX_WC_TPC_Track >  DeltaXLowerBound && DeltaX_WC_TPC_Track < DeltaXUpperBound && 
-	     DeltaY_WC_TPC_Track > DeltaYLowerBound && DeltaY_WC_TPC_Track < DeltaYUpperBound &&
-	     alpha < alphaCut )
-	    {
-	    // ### Counting the matched tracks ###
-	    nMatchedTracks++;
-	    
-	    // ### Setting the index of this track to true ###
-	    MatchTPC_WVTrack[nTPCtrk] = true;
-	    
-	    // ### Setting the WCTrack Index = 1 if this WCTrack was matched ###
-	    MatchWCTrackIndex[mwctrk] = 1;
-	    }  
+      if( DeltaX_WC_TPC_Track >  DeltaXLowerBound && DeltaX_WC_TPC_Track < DeltaXUpperBound && 
+	  DeltaY_WC_TPC_Track > DeltaYLowerBound && DeltaY_WC_TPC_Track < DeltaYUpperBound &&
+	  alpha < alphaCut )
+         {
+	 // ### Counting the matched tracks ###
+	 nMatchedTracks++;
 	 
-	 }//<---end nTPCtrk loop
+	 // ### Setting the index of this track to true ###
+	 MatchTPC_WVTrack[nTPCtrk] = true;
+
+         }  
+	 
+      }//<---end nTPCtrk loop
       
       
-      }//<---End loop over wire chamber tracks
    
    // ### Filling the number of matched WC and TPC Tracks ###
    hdataNMatchTPCWCTrk->Fill(nMatchedTracks);
@@ -698,8 +916,13 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
    
    // ### Counting the number of events with ONE WC track matched ###
    nEvtsWCTrackMatch++;
-   
-   
+
+
+
+
+
+
+
    // ===========================================================================================================================================
    // 						Vetoing Shower Like Events 
    // ===========================================================================================================================================   
@@ -732,27 +955,17 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
    // =========================================================================================================================================
    
    // ---   First grab the tracks "initial" momentum which we take from ---
-   // --- the momentum of the wire chamber track which has been matched ---
+   // --- the momentum of the primary MC track which has been matched ---
    // ---  and correct for the "typical" energy loss for a track in the ---
    // ---   argon between the cryostat and the front face of the TPC    ---
    
    
-   float momentum = 999;
    
-   // ###################################################
-   // ### Grabbing the Wire Chamber Track Information ###
-   // ###################################################
-   for(size_t mwctrk = 0; mwctrk < nwctrks; mwctrk++)
-      {
-      // ### Skip this WCTrack if it isn't the matched one ###
-      if(MatchWCTrackIndex[mwctrk] < 1 || MatchWCTrackIndex[mwctrk] > 1){continue;}
-      
-      
-      hdataWCTRKMomentum->Fill(wctrk_momentum[mwctrk]);//Momentum of the matched track
-      momentum =wctrk_momentum[mwctrk];
-      
-      }//<---End mwctrk
-   
+   // #############################################################
+   // ### Calculating the momentum from the MC Primary Particle ###
+   // #############################################################
+   float momentum = sqrt( (g4Primary_Px[0]*g4Primary_Px[0]) + (g4Primary_Py[0]*g4Primary_Py[0]) + (g4Primary_Pz[0]*g4Primary_Pz[0]) );
+         
    
    // ###   Calculating the initial Kinetic Energy    ###
    // ### KE = Energy - mass = (p^2 + m^2)^1/2 - mass ###
@@ -770,8 +983,9 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
    // ###############################################
    hdataInitialKEMomentum->Fill(kineticEnergy, EventWeight);
    hdataInitialKEMomentumUnWeighted->Fill(kineticEnergy);
-   
-   
+
+
+
    // =========================================================================================================================================
    //							 Calorimetry Points
    // =========================================================================================================================================
@@ -844,8 +1058,8 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
 	    
 	    // ### IF the Delta E is between 7 and 25, tag as a stopping track ###
 	    if(lastDeltaE >= 7 && lastDeltaE <= 25)
-	       {
 	       // ### Only setting the flag if we are tagging events ###
+	       {
 	       if(RemoveStopping)
 	          {StoppingParticle[nTPCtrk] = true;}
 	       
@@ -1013,7 +1227,8 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
 	 // ############################################################
 	 else if(Piondedx[caloPoints] > 40. && caloPoints < (nPionSpts-1) && caloPoints > 0.)
 	    {
-	    std::cout<<"Large Fluctuation"<<std::endl;
+	    
+	    if(VERBOSE){std::cout<<"Large Fluctuation"<<std::endl;}
 	    // #################################################################
 	    // ### Then just average between the previous and the next point ###
 	    // #################################################################
@@ -1038,7 +1253,7 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
 	 // ### If dE/dX > 15 and more than 10cm from the end of the track and isn't the first or last point ###
 	 if(Piondedx[caloPoints] > 15. && Pionresrange[caloPoints] > 10. && caloPoints > 0.&& caloPoints < (nPionSpts-1) )
 	    {
-	    std::cout<<"Small Fluctuation"<<std::endl;
+	    if(VERBOSE){std::cout<<"Small Fluctuation"<<std::endl;}
 	    // ### Check to see if the previous point is greater than 15 ###
 	    if(Piondedx[caloPoints-1] > 15.)
 	       {
@@ -1092,13 +1307,22 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
       // ############################################
       for(size_t npoints = 0; npoints < nPionSpts; npoints++)
          {
-	 // ### Filling the incidient histogram ###
-         hdataIncidentKE->Fill(kineticEnergy);
+	 // ### Filling the incidient histogram weighted by beam profile ###
+         hdataIncidentKE->Fill(kineticEnergy, EventWeight);
+	 
+	 hdataIncidentKEunweighted->Fill(kineticEnergy);
       
          // ###            Filling the interaction histogram for the last spt          ###
 	 // ### As long as it isn't a through going track and isn't tagged as stopping ###
          if(npoints == nPionSpts -1 && !ThroughGoingTrack[nTPCtrk] && !StoppingParticle[nTPCtrk] )
-            {hdataInteractingKE->Fill(kineticEnergy);}
+            {
+	    
+	    // ### Weighting the Interaction by the beam profile ###
+	    hdataInteractingKE->Fill(kineticEnergy, EventWeight);
+	    
+	    // ### Saving the unweighted interaction ###
+	    hdataInteractingKEunweighted->Fill(kineticEnergy);
+	    }
          
 	 // ################################################
 	 // ### Subtracting the energy loss in this step ###
@@ -1115,9 +1339,10 @@ for (Long64_t jentry=0; jentry<nentries;jentry++)
       
          }//<---End npoints loop
       }//<---End nTPCtrk loop
-   
-   
-   
+
+
+
+
 
    }//<---End jentry loop
 
@@ -1185,6 +1410,7 @@ std::cout<<"### Number of Events w/ Good TPC info (nHits > 0)		     = "<<nEvntsT
 std::cout<<"-------------------------------   Stage 1   ----------------------------"<<std::endl;
 std::cout<<"### Number of Events w/ PID consistent with Pi/Mu                = "<<nEvtsPID<<" ###"<<std::endl;
 std::cout<<"-------------------------------   Stage 2   ----------------------------"<<std::endl;
+std::cout<<"### Number of Events w/ Primary MC which enters the TPC                   = "<<nEvtsGoodMC<<" ###"<<std::endl;
 std::cout<<"### Number of Events w/ Trk Z < "<<FirstSpacePointZPos<<"                                = "<<nEvtsTrackZPos<<" ###"<<std::endl;
 std::cout<<"### Number of Events w/ < "<<nLowZTracksAllowed<<" tracks in the first "<<UpperPartOfTPC<<" cm of the TPC = "<<nLowZTrkEvents<<" ###"<<std::endl;
 std::cout<<"### Number of Events w/ ONE WC Track Matched                     = "<<nEvtsWCTrackMatch<<" ###"<<std::endl;
@@ -1200,13 +1426,27 @@ std::cout<<std::endl;
 // ###############################################
 // ### Creating a file to output my histograms ###
 // ###############################################
-TFile myfile("Data_PionXSection_histos_noCorrections.root","RECREATE");
-//TFile myfile("Data_PionXSection_histos_reorderingOnly.root","RECREATE");
 
+TFile myfile("PionMC_PionXSection_histos_noCorrections.root","RECREATE");
+//TFile myfile("PionMC_PionXSection_histos_reorderingOnly.root","RECREATE");
 
-hdataWCTrackExist->Write();
-hdataTOFNoCuts->Write(); 
-hdataWCTrackMomentumVSTOF->Write();  
+// ### MC Info ###
+hMCPrimaryStartX->Write();
+hMCPrimaryStartY->Write();
+hMCPrimaryStartZ->Write();
+hMCPrimaryProjectedStartX->Write();
+hMCPrimaryProjectedStartY->Write();
+hMCPrimaryProjectedStartZ->Write();
+hMCPrimaryEndX->Write();
+hMCPrimaryEndY->Write();
+hMCPrimaryEndZ->Write();
+hMCPrimaryEndXvsZ->Write();
+hMCPrimaryEndYvsZ->Write();
+hMCPrimaryProcess->Write();
+hMCPrimaryPx->Write();
+hMCPrimaryPy->Write();
+hMCPrimaryPz->Write();
+
 hdataUpstreamZPos->Write();
 hdataTPCTheta->Write();
 hdataTPCPhi->Write();
@@ -1225,7 +1465,9 @@ hdataPionTrkPitch->Write();
 hdataPiondEdXvsRR->Write();
 hdataLowMomentumTrkPIDA->Write();
 hdataIncidentKE->Write();
+hdataIncidentKEunweighted->Write();
 hdataInteractingKE->Write();
-fCrossSection->Write();
-hRecoLength->Write();
-}//<---End Data::Loop()
+hdataInteractingKEunweighted->Write();
+fCrossSection->Write();   
+hRecoLength->Write();   
+}//<---End Loop() Function
